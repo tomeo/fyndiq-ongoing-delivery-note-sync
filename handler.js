@@ -45,7 +45,7 @@ exports.handler = async event => {
   const result = await keyPromise;
 
   const ongoing = {
-    apiUrl: result.Parameters.find(p => p.Name === ONGOING.API_URL)
+    apiUrl: result.Parameters.find(p => p.Name === ONGOING.APIURL)
       .Value,
     goodsOwnerId: result.Parameters.find(
       p => p.Name === ONGOING.GOODSOWNERID,
