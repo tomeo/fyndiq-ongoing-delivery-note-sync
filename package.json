@@ -1,0 +1,21 @@
+{
+  "name": "fyndiq-ongoing-delivery-note-sync",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write \"**/*.+(js|md|yml|yaml)\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.6.0",
+    "prettier-eslint-cli": "^5.0.0",
+    "serverless-iam-roles-per-function": "^2.0.2"
+  }
+}
