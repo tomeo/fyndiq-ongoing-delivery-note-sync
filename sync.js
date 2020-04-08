@@ -2,26 +2,6 @@ const OngoingClient = require('./lib/ongoingClient');
 const createFyndiq = require('./lib/fyndiqClient');
 const createLogClient = require('./lib/slackClient');
 
-const handleOrder = async (logger, cdonClient, ongoingClient) => {
-  const fileName = `CDON.${order.OrderId}.pdf`;
-  const files = await ongoingClient.orderFiles(order.OngoingId);
-
-  if (hasFile(files, fileName)) {
-    logger.log(`Order ${order.OrderId} HAS file ${fileName}`);
-  } else {
-    logger.log(
-      `Order ${order.OrderId} DOES NOT have file ${fileName}`,
-    );
-    const pdfData = await cdonClient.deliveryNote(order);
-    await ongoingClient.uploadDeliveryNote(
-      order.OngoingId,
-      fileName,
-      pdfData,
-    );
-    logger.log(`Uploaded ${fileName} to order ${order.OrderId}`);
-  }
-};
-
 const sync = async (
   description,
   fyndiqSettings,
@@ -65,21 +45,26 @@ const sync = async (
       .filter(fo => fo.ongoingId)
       .map(order => {
         const filename = `Fyndiq.${order.sid}.pdf`;
-        return ongoing
-          .orderFiles(order.ongoingId)
-          .then(files =>
-            files.some(file => file.fileName === filename)
-              ? Promise.resolve()
-              : fyndiq
-                  .deliveryNote(order.id)
-                  .then(pdfData =>
-                    ongoing.uploadDeliveryNote(
-                      order.ongoingId,
-                      filename,
-                      pdfData,
-                    ),
-                  ),
-          );
+        return ongoing.orderFiles(order.ongoingId).then(files => {
+          if (files.some(file => file.fileName === filename)) {
+            logger.log(`Order ${order.OrderId} HAS file ${fileName}`);
+            return Promise.resolve();
+          }
+          return fyndiq
+            .deliveryNote(order.id)
+            .then(pdfData =>
+              ongoing.uploadDeliveryNote(
+                order.ongoingId,
+                filename,
+                pdfData,
+              ),
+            )
+            .then(() =>
+              logger.log(
+                `Uploaded ${fileName} to order ${order.OrderId}`,
+              ),
+            );
+        });
       }),
   );
 
